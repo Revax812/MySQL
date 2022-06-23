@@ -1,6 +1,6 @@
 #This are the language settings from MySQL.
 #You can customize every single message and add custom colors via § prefix.
-#You must not create / edit / remove words in capital letters that already exist or are not from yourself
+#You must not create / edit / remove words in capital letters that already exist or are not from yourself.
 #You must not add custom colors or special characters, etc. to config setup messages.
 Messages:
   ConfigMessages:
@@ -9,7 +9,7 @@ Messages:
     ConfigSetupDatabaseHost: "Enter your database host here"
     ConfigSetupUsername: "Enter your username here"
     ConfigSetupPassword: "Enter your password here"
-    ConfigSetupConfigurationNotSetError: "§cMySQL Configuration not set. Please enter your data in: PACKAGELOCATION  and reload the server."
+    ConfigSetupConfigurationNotSetError: "§cMySQL Configuration not set. Please enter your data in: PACKAGELOCATION and reload the server."
     ConfigDeleted: "§cAll values of the MySQL config have been deleted."
     ConfigPathDeleted: "§cThe value of the MySQL config path CONFIGPATH has been deleted."
     ConfigDeletionErrorAllowClearConfigFalse: "§cDeleting the MySQL config is not possible, allowClearConfig is false."
