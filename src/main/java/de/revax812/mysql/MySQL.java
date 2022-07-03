@@ -14,9 +14,7 @@ import org.bukkit.Bukkit;
 import org.bukkit.plugin.Plugin;
 import de.revax812.customconfig.Config;
 
-import java.sql.Connection;
-import java.sql.SQLException;
-import java.sql.DriverManager;
+import java.sql.*;
 
 /**
  * Allows to create and execute custom MySQL Databases for Minecraft Spigot.<br>
@@ -343,6 +341,42 @@ public class MySQL {
 
         String[] message = languageSettings.getString("Messages." + ".ConfigMessages." + ".ConfigSetupConfigurationNotSetError").split("PACKAGELOCATION");
         Bukkit.getConsoleSender().sendMessage(message[0] + plugin.getDataFolder() + "\\settings\\mysql\\mysql.yml" + message[1]);
+    }
+
+    /**
+     * Sets or updates a value of the {@link MySQL} database.
+     * <br><br>
+     *
+     * @param qry represents the {@link MySQL} command
+     */
+    public void update(String qry) {
+        try {
+            PreparedStatement st = getConnection().prepareStatement(qry);
+            st.executeUpdate();
+            st.close();
+        } catch (SQLException e) {
+            connect();
+            System.err.println(e);
+        }
+    }
+
+    /**
+     * Gets a value out of the {@link MySQL} database.
+     * <br><br>
+     *
+     * @param qry  represents the {@link MySQL} command<br>
+     * @return     the {@link ResultSet} rs
+     */
+    public ResultSet query(String qry) {
+        ResultSet rs = null;
+        try {
+            PreparedStatement st = getConnection().prepareStatement(qry);
+            rs = st.executeQuery();
+        } catch (SQLException e) {
+            connect();
+            System.err.println(e);
+        }
+        return rs;
     }
 
     /**
