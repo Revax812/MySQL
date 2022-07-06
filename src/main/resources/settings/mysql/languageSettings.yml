@@ -19,3 +19,7 @@ Messages:
   MySQLConnectionError: "§cConnection to database failed."
   MySQLDisconnected: "§cThe connection to the database has been disconnected."
   MySQLReconnected: "§aMySQL was successfully reconnected."
+  MySQLErrorInputStreamNull: "§cInputStream is null (plugin.getClass().getClassLoader().getResourceAsStream(\"FILENAME\")."
+  MySQLErrorCouldNotReadFile: "§cCould not read db file."
+  MySQLSetupComplete: "§aDatabase setup complete."
+  MySQLScriptComplete: "§aDatabase script complete."

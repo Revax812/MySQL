@@ -4,7 +4,7 @@
  * Version: 1.0
  * Last Change:
  *    by:   Revax812
- *    date: 23.06.2022, 15:19
+ *    date: 06.07.2022, 17:55
  * Copyright (c): Revax812, 2022
  */
 
@@ -15,6 +15,11 @@ import org.bukkit.plugin.Plugin;
 import de.revax812.customconfig.Config;
 
 import java.sql.*;
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.util.stream.Collectors;
 
 /**
  * Allows to create and execute custom MySQL Databases for Minecraft Spigot.<br>
@@ -28,6 +33,10 @@ import java.sql.*;
 
 public class MySQL {
 
+    /**
+     * The public {@link Plugin} plugin
+     */
+    public Plugin plugin;
     /**
      * The public {@link Connection} connection
      */
@@ -207,6 +216,7 @@ public class MySQL {
     public MySQL(Plugin plugin, String customConfigPath, String customConfigName, boolean autoReconnect, boolean copyDefaults) {
         this.mysql = new Config(plugin, customConfigPath, customConfigName, copyDefaults);
         this.languageSettings = new Config(plugin, "settings/mysql/", "languageSettings.yml", true);
+        this.plugin = plugin;
 
         if (!mysql.isSet("MySQL.")) setupConfig(plugin);
         else {
@@ -264,6 +274,7 @@ public class MySQL {
     public MySQL(boolean copyDefaults, Plugin plugin, String customConfigPath, String customConfigName) {
         this.mysql = new Config(plugin, customConfigPath, customConfigName, copyDefaults);
         this.languageSettings = new Config(plugin, "settings/mysql/", "languageSettings.yml", true);
+        this.plugin = plugin;
 
         if (!mysql.isSet("MySQL.")) setupConfig(plugin);
         else {
@@ -314,6 +325,7 @@ public class MySQL {
      */
     public MySQL(Plugin plugin, String database, int port, String host, String username, String password, boolean autoReconnect) {
         this.languageSettings = new Config(plugin, "settings/mysql/", "languageSettings.yml", true);
+        this.plugin = plugin;
         this.database = database;
         this.port = port;
         this.host = host;
@@ -353,7 +365,6 @@ public class MySQL {
         try {
             PreparedStatement st = getConnection().prepareStatement(qry);
             st.executeUpdate();
-            st.close();
         } catch (SQLException e) {
             connect();
             System.err.println(e);
@@ -455,6 +466,45 @@ public class MySQL {
     }
 
     /**
+     * Reads and performs the {@link java.io.File} dbsetup.sql (located in resources) if created by you.
+     * <br><br>
+     */
+    private void dbSetup() {
+        if (isConnected()) {
+            runScript("dbsetup.sql");
+            Bukkit.getConsoleSender().sendMessage(languageSettings.getString("Messages." + ".MySQLSetupComplete"));
+        } else Bukkit.getConsoleSender().sendMessage(languageSettings.getString("Messages." + ".MySQLConnectionError"));
+    }
+
+    /**
+     * Reads and performs the {@link java.io.File} file.sql (located in resources) if created by you.
+     * <br><br>
+     */
+    public void runScript(String fileName) {
+        String setup = null;
+        try (InputStream in = plugin.getClass().getClassLoader().getResourceAsStream(fileName)) {
+            if (in != null) setup = new BufferedReader(new InputStreamReader(in)).lines().collect(Collectors.joining("\n"));
+            else {
+                String[] message = languageSettings.getString("Messages." + ".MySQLErrorInputStreamNull.").split("FILENAME");
+                throw new NullPointerException(message[0] + fileName + message[1]);
+            }
+        } catch (IOException e) {
+            Bukkit.getConsoleSender().sendMessage(languageSettings.getString("Messages." + ".MySQLErrorCouldNotReadFile"));
+            e.printStackTrace();
+        }
+        String[] queries = setup.split(";");
+        for (String query : queries) {
+            if (query.chars().allMatch(Character::isWhitespace)) continue;
+            try (PreparedStatement stmt = getConnection().prepareStatement(query)) {
+                stmt.execute();
+            } catch (SQLException e) {
+                throw new RuntimeException(e);
+            }
+        }
+        Bukkit.getConsoleSender().sendMessage(languageSettings.getString("Messages." + ".MySQLScriptComplete"));
+    }
+
+    /**
      * Clears the MySQL-Config-Settings.
      * <br><br
      */
@@ -491,20 +541,26 @@ public class MySQL {
      * Checks if the MySQL Database has a {@link Connection} connection.
      * <br><br>
      *
-     * @return the {@link Boolean} hasConnection
+     * Redirects to {@link #isConnected()}.<br>
+     * @return the {@link Boolean} hasConnection<br>
+     * @see    #isConnected()
      */
     public Boolean hasConnection() {
-        return connection != null;
+        return isConnected();
     }
 
     /**
-     * Checks if the MySQL Database is connected.
+     * Checks if the MySQL Database is connected via a {@link Connection} connection.
      * <br><br>
      *
      * @return the {@link Boolean} isConnected
      */
     public Boolean isConnected() {
-        return connection != null;
+        try {
+            return connection != null && connection.isValid(1000);
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
     }
 
     /**
