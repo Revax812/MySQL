@@ -469,7 +469,7 @@ public class MySQL {
      * Reads and performs the {@link java.io.File} dbsetup.sql (located in resources) if created by you.
      * <br><br>
      */
-    private void dbSetup() {
+    public void dbSetup() {
         if (isConnected()) {
             runScript("dbsetup.sql");
             Bukkit.getConsoleSender().sendMessage(languageSettings.getString("Messages." + ".MySQLSetupComplete"));
