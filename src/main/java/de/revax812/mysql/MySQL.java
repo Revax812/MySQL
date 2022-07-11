@@ -4,7 +4,7 @@
  * Version: 1.0
  * Last Change:
  *    by:   Revax812
- *    date: 06.07.2022, 17:55
+ *    date: 11.07.2022, 18:24
  * Copyright (c): Revax812, 2022
  */
 
@@ -342,7 +342,7 @@ public class MySQL {
      *
      * @param plugin represents the {@link Plugin} plugin like the Main class
      */
-    private void setupConfig(Plugin plugin) {
+    public void setupConfig(Plugin plugin) {
         mysql.set("MySQL." + ".database", languageSettings.getString("Messages." + ".ConfigMessages." + ".ConfigSetupDatabaseName"));
         mysql.set("MySQL." + ".port", languageSettings.getString("Messages." + ".ConfigMessages." + ".ConfigSetupDatabasePort"));
         mysql.set("MySQL." + ".host", languageSettings.getString("Messages." + ".ConfigMessages." + ".ConfigSetupDatabaseHost"));
